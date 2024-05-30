@@ -19,31 +19,38 @@ def deposito(saldo, valor, extrato):
     if valor > 0:
         saldo += valor
         extrato += f"\nDepósito: R$ {valor:.2f}\n"
+        return saldo, extrato
 
     else:
         print("Valor inválido")
+        return False
 
 
-def saque(*, saldo=saldo, valor, extrato=extrato, limite=limite_saque, numero_saques=numero_saque, limite_saques=LIMITE_SAQUE):
+def saque(*, saldo, valor, extrato, limite, numero_saques, limite_saques):
     if valor > saldo:
         print("\nSaldo insuficiente")
+        return False
 
     elif valor > limite:
         print(f"\nLimite de saque no valor de R$ {limite_saque:.2f}")
+        return False
 
     elif numero_saques >= limite_saques:
         print("\nNúmero de saques diários atingidos, tente novamente amanhã!")
+        return False
 
     elif valor > 0:
         saldo -= valor
         numero_saques += 1
         extrato += f"\nSaque: R$ {valor:.2f}\n"
 
+        return saldo, numero_saques, extrato
+
     else:
         print("Valor inválido")
 
 
-def extrato(saldo, /, *, extrato=extrato):
+def exibir_extrato(saldo, /, *, extrato=extrato):
     print(" Extrato ".center(21, "-"))
     print(extrato if extrato else "Não foram realizadas movimentações")
     print(f"\nSaldo: R$ {saldo:.2f}")
@@ -56,15 +63,25 @@ while True:
     if opcao == "d":
         valor = float(input("Digite o valor a ser depositado: "))
 
-        deposito(saldo, valor, extrato)
+        res = deposito(saldo, valor, extrato)
+
+        if res:
+            saldo = res[0]
+            extrato = res[1]
 
     elif opcao == "s":
         valor = float(input("Digite o valor para saque: "))
 
-        saque(valor=valor)
+        res = saque(saldo=saldo, valor=valor, extrato=extrato, limite=limite_saque,
+                    numero_saques=numero_saque, limite_saques=LIMITE_SAQUE)
+
+        if res:
+            saldo = res[0]
+            numero_saque = res[1]
+            extrato = res[2]
 
     elif opcao == "e":
-        extrato(saldo, extrato=extrato)
+        exibir_extrato(saldo, extrato=extrato)
 
     elif opcao == "q":
         break
