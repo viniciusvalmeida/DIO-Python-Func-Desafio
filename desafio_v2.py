@@ -3,6 +3,8 @@ extrato = ""
 limite_saque = 500
 numero_saque = 0
 LIMITE_SAQUE = 3
+clientes = []
+contas = []
 
 menu = """
 ----- MENU -----
@@ -10,6 +12,8 @@ menu = """
 [d] Depositar
 [s] Sacar
 [e] Extrato
+[c] Criar cliente
+[n] Nova conta
 [q] Sair
 
 => """
@@ -57,6 +61,15 @@ def exibir_extrato(saldo, /, *, extrato=extrato):
     print("".center(21, "-"))
 
 
+def criar_cliente(cliente, clientes: list):
+    for c in clientes:
+        if c["cpf"] == cliente["cpf"]:
+            return 'Cliente já cadastrado'
+
+    clientes.append(cliente)
+    return f"Bem vindo {cliente["nome"]} ao nosso banco!"
+
+
 while True:
     opcao = input(menu)
 
@@ -82,6 +95,22 @@ while True:
 
     elif opcao == "e":
         exibir_extrato(saldo, extrato=extrato)
+
+    elif opcao == "c":
+        nome = input("Digite o nome do cliente: ")
+        data_nascimento = input("Digite a data de nascimento: ")
+        cpf = input("Digite o CPF: ")
+        logradouro = input("Digite o logradouro: ")
+        bairro = input("Digite o bairro: ")
+        estado = input("Digite o estado: ")
+
+        cliente = {"nome": nome, "data_nascimento": data_nascimento, "cpf": cpf,
+                   "endereco": {"logradouro": logradouro, "bairro": bairro, "estado": estado}}
+
+        print(criar_cliente(cliente, clientes))
+
+    elif opcao == "n":
+        pass
 
     elif opcao == "q":
         break
