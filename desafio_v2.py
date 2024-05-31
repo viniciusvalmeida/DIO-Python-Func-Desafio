@@ -5,6 +5,8 @@ numero_saque = 0
 LIMITE_SAQUE = 3
 clientes = []
 contas = []
+AGENCIA = "0001"
+numero_conta = 1
 
 menu = """
 ----- MENU -----
@@ -14,6 +16,7 @@ menu = """
 [e] Extrato
 [c] Criar cliente
 [n] Nova conta
+[l] Listar contas
 [q] Sair
 
 => """
@@ -64,10 +67,32 @@ def exibir_extrato(saldo, /, *, extrato=extrato):
 def criar_cliente(cliente, clientes: list):
     for c in clientes:
         if c["cpf"] == cliente["cpf"]:
-            return 'Cliente já cadastrado'
+            return '\n\nCliente já cadastrado!'
 
     clientes.append(cliente)
-    return f"Bem vindo {cliente["nome"]} ao nosso banco!"
+    return f"\n\nBem vindo {cliente["nome"]} ao nosso banco!"
+
+
+def criar_conta(cpf: str):
+    global numero_conta
+    for cliente in clientes:
+        if cliente["cpf"] == cpf:
+            conta = {"agencia": AGENCIA,
+                     "numero_conta": numero_conta, "usuario": cliente}
+            contas.append(conta)
+            numero_conta += 1
+            return "\nConta criada com sucesso"
+
+    return "\nCliente não encontrado"
+
+
+def listar_contas():
+    for conta in contas:
+        print(f"""
+        DONO: {conta["usuario"]["nome"]}
+        CPF: {conta["usuario"]["cpf"]}
+        NUMERO: {conta["numero_conta"]}
+        """)
 
 
 while True:
@@ -110,7 +135,12 @@ while True:
         print(criar_cliente(cliente, clientes))
 
     elif opcao == "n":
-        pass
+        cpf = input("Digite o CPF do dono da conta: ")
+
+        print(criar_conta(cpf))
+
+    elif opcao == 'l':
+        listar_contas()
 
     elif opcao == "q":
         break
