@@ -1,12 +1,12 @@
+AGENCIA = "0001"
+LIMITE_SAQUE = 3
+
 saldo = 0
 extrato = ""
 limite_saque = 500
-numero_saque = 0
-LIMITE_SAQUE = 3
+numero_saques = 0
 clientes = []
 contas = []
-AGENCIA = "0001"
-numero_conta = 1
 
 menu = """
 ----- MENU -----
@@ -22,45 +22,45 @@ menu = """
 => """
 
 
-def deposito(saldo, valor, extrato):
+def deposito(saldo, valor, extrato, /):
     if valor > 0:
         saldo += valor
-        extrato += f"\nDepósito: R$ {valor:.2f}\n"
-        return saldo, extrato
+        extrato += f"\nDepósito: \tR$ {valor:.2f}\n"
+        print("Depósito realizado com sucesso!")
 
     else:
-        print("Valor inválido")
-        return False
+        print("Valor inválido!")
+
+    return saldo, extrato
 
 
 def saque(*, saldo, valor, extrato, limite, numero_saques, limite_saques):
     if valor > saldo:
         print("\nSaldo insuficiente")
-        return False
 
     elif valor > limite:
         print(f"\nLimite de saque no valor de R$ {limite_saque:.2f}")
-        return False
 
     elif numero_saques >= limite_saques:
         print("\nNúmero de saques diários atingidos, tente novamente amanhã!")
-        return False
 
     elif valor > 0:
         saldo -= valor
         numero_saques += 1
-        extrato += f"\nSaque: R$ {valor:.2f}\n"
-
-        return saldo, numero_saques, extrato
+        extrato += f"\nSaque: \tR$ {valor:.2f}\n"
+        print(
+            f"Saque realizado com sucesso no valor de R$ {valor:.2f}\n\nNúmero de saques restantes: {numero_saques}")
 
     else:
         print("Valor inválido")
+
+    return saldo, extrato
 
 
 def exibir_extrato(saldo, /, *, extrato=extrato):
     print(" Extrato ".center(21, "-"))
     print(extrato if extrato else "Não foram realizadas movimentações")
-    print(f"\nSaldo: R$ {saldo:.2f}")
+    print(f"\nSaldo: \tR$ {saldo:.2f}")
     print("".center(21, "-"))
 
 
@@ -70,17 +70,16 @@ def criar_cliente(cliente, clientes: list):
             return '\n\nCliente já cadastrado!'
 
     clientes.append(cliente)
-    return f"\n\nBem vindo {cliente["nome"]} ao nosso banco!"
+    return f"\n\nBem vindo {cliente['nome']} ao nosso banco!"
 
 
 def criar_conta(cpf: str):
-    global numero_conta
+    numero_conta = len(contas) + 1
     for cliente in clientes:
         if cliente["cpf"] == cpf:
             conta = {"agencia": AGENCIA,
                      "numero_conta": numero_conta, "usuario": cliente}
             contas.append(conta)
-            numero_conta += 1
             return "\nConta criada com sucesso"
 
     return "\nCliente não encontrado"
@@ -101,22 +100,13 @@ while True:
     if opcao == "d":
         valor = float(input("Digite o valor a ser depositado: "))
 
-        res = deposito(saldo, valor, extrato)
-
-        if res:
-            saldo = res[0]
-            extrato = res[1]
+        saldo, extrato = deposito(saldo, valor, extrato)
 
     elif opcao == "s":
         valor = float(input("Digite o valor para saque: "))
 
-        res = saque(saldo=saldo, valor=valor, extrato=extrato, limite=limite_saque,
-                    numero_saques=numero_saque, limite_saques=LIMITE_SAQUE)
-
-        if res:
-            saldo = res[0]
-            numero_saque = res[1]
-            extrato = res[2]
+        saldo, extrato = saque(saldo=saldo, valor=valor, extrato=extrato,
+                               limite=limite_saque, numero_saques=numero_saques, limite_saques=LIMITE_SAQUE)
 
     elif opcao == "e":
         exibir_extrato(saldo, extrato=extrato)
