@@ -26,7 +26,7 @@ def deposito(saldo, valor, extrato, /):
     if valor > 0:
         saldo += valor
         extrato += f"\nDepósito: \tR$ {valor:.2f}\n"
-        print("Depósito realizado com sucesso!")
+        print("\n\nDepósito realizado com sucesso!")
 
     else:
         print("Valor inválido!")
@@ -34,7 +34,9 @@ def deposito(saldo, valor, extrato, /):
     return saldo, extrato
 
 
-def saque(*, saldo, valor, extrato, limite, numero_saques, limite_saques):
+def saque(*, saldo, valor, extrato, limite, limite_saques):
+    global numero_saques
+
     if valor > saldo:
         print("\nSaldo insuficiente")
 
@@ -49,7 +51,7 @@ def saque(*, saldo, valor, extrato, limite, numero_saques, limite_saques):
         numero_saques += 1
         extrato += f"\nSaque: \tR$ {valor:.2f}\n"
         print(
-            f"Saque realizado com sucesso no valor de R$ {valor:.2f}\n\nNúmero de saques restantes: {numero_saques}")
+            f"\n\nSaque realizado com sucesso no valor de R$ {valor:.2f}\n\nNúmero de saques restantes: {numero_saques}")
 
     else:
         print("Valor inválido")
@@ -60,32 +62,52 @@ def saque(*, saldo, valor, extrato, limite, numero_saques, limite_saques):
 def exibir_extrato(saldo, /, *, extrato=extrato):
     print(" Extrato ".center(21, "-"))
     print(extrato if extrato else "Não foram realizadas movimentações")
-    print(f"\nSaldo: \tR$ {saldo:.2f}")
+    print(f"\nSaldo: \t\tR$ {saldo:.2f}")
     print("".center(21, "-"))
 
 
-def criar_cliente(cliente, clientes: list):
+def criar_cliente(clientes: list):
+    cpf = input("Digite o CPF: ")
+
     for c in clientes:
-        if c["cpf"] == cliente["cpf"]:
-            return '\n\nCliente já cadastrado!'
+        if c["cpf"] == cpf:
+            print('\n\nCliente já cadastrado!')
+            return
+
+    nome = input("Digite o nome do cliente: ")
+    data_nascimento = input("Digite a data de nascimento: ")
+    logradouro = input("Digite o logradouro: ")
+    bairro = input("Digite o bairro: ")
+    estado = input("Digite o estado: ")
+
+    cliente = {"nome": nome, "data_nascimento": data_nascimento, "cpf": cpf,
+               "endereco": {"logradouro": logradouro, "bairro": bairro, "estado": estado}}
 
     clientes.append(cliente)
-    return f"\n\nBem vindo {cliente['nome']} ao nosso banco!"
+
+    print(f"\n\nBem vindo {cliente['nome']} ao nosso banco!")
 
 
 def criar_conta(cpf: str):
     numero_conta = len(contas) + 1
+
     for cliente in clientes:
         if cliente["cpf"] == cpf:
             conta = {"agencia": AGENCIA,
                      "numero_conta": numero_conta, "usuario": cliente}
             contas.append(conta)
-            return "\nConta criada com sucesso"
+            print("\nConta criada com sucesso")
+            return
 
-    return "\nCliente não encontrado"
+    print("\nCliente não encontrado")
+    return
 
 
 def listar_contas():
+    if len(contas) < 1:
+        print("\n\nContas inexistentes!")
+        return
+
     for conta in contas:
         print(f"""
         DONO: {conta["usuario"]["nome"]}
@@ -106,28 +128,18 @@ while True:
         valor = float(input("Digite o valor para saque: "))
 
         saldo, extrato = saque(saldo=saldo, valor=valor, extrato=extrato,
-                               limite=limite_saque, numero_saques=numero_saques, limite_saques=LIMITE_SAQUE)
+                               limite=limite_saque, limite_saques=LIMITE_SAQUE)
 
     elif opcao == "e":
         exibir_extrato(saldo, extrato=extrato)
 
     elif opcao == "c":
-        nome = input("Digite o nome do cliente: ")
-        data_nascimento = input("Digite a data de nascimento: ")
-        cpf = input("Digite o CPF: ")
-        logradouro = input("Digite o logradouro: ")
-        bairro = input("Digite o bairro: ")
-        estado = input("Digite o estado: ")
-
-        cliente = {"nome": nome, "data_nascimento": data_nascimento, "cpf": cpf,
-                   "endereco": {"logradouro": logradouro, "bairro": bairro, "estado": estado}}
-
-        print(criar_cliente(cliente, clientes))
+        criar_cliente(clientes)
 
     elif opcao == "n":
         cpf = input("Digite o CPF do dono da conta: ")
 
-        print(criar_conta(cpf))
+        criar_conta(cpf)
 
     elif opcao == 'l':
         listar_contas()
